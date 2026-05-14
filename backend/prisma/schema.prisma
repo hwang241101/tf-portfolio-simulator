@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id        BigInt   @id @default(autoincrement())
+  email     String   @unique
+  portfolios Portfolio[]
+}
+
+model Portfolio {
+  id           BigInt   @id @default(autoincrement())
+  userId       BigInt
+  name         String
+  baseCurrency String   @default("JPY")
+
+  user User @relation(fields: [userId], references: [id])
+  allocations Allocation[]
+  transactions Transaction[]
+}
+
+model Asset {
+  id        BigInt   @id @default(autoincrement())
+  name      String
+  ticker    String   @unique
+  currency  String   @default("USD")
+
+  allocations Allocation[]
+  transactions Transaction[]
+}
+
+model Allocation {
+  id           BigInt @id @default(autoincrement())
+  portfolioId  BigInt
+  assetId      BigInt
+  targetRatio  Decimal @db.Decimal(7, 6)
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id])
+  asset Asset @relation(fields: [assetId], references: [id])
+
+  @@unique([portfolioId, assetId])
+}
+
+model Transaction {
+  id            BigInt @id @default(autoincrement())
+  portfolioId   BigInt
+  assetId       BigInt
+  type          String
+  quantity      Decimal @db.Decimal(18, 8)
+  price         Decimal @db.Decimal(18, 4)
+  fee           Decimal @db.Decimal(18, 4) @default(0)
+  transactionDate DateTime
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id])
+  asset Asset @relation(fields: [assetId], references: [id])
+}
