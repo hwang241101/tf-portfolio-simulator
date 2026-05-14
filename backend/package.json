@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev src/app.ts"
+    "dev": "ts-node-dev src/app.ts",
+    "build": "prisma generate && tsc",
+    "start": "node dist/src/app.js",
+    "postinstall": "prisma generate",
+    "zip:eb": "npm run build && zip -r ../etf-api-deploy.zip . -x 'node_modules/*' -x '.env' -x '*.zip' -x '.git/*'"
   },
   "keywords": [],
   "author": "",

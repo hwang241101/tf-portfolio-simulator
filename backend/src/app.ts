@@ -1,9 +1,5 @@
 import express from "express";
 import cors from "cors";
-import transactionRoutes from "./routes/transaction.route";
-import portfolioRoutes from "./routes/portfolio.route";
-import assetRoutes from "./routes/asset.route";
-import allocationRoutes from "./routes/allocation.route";
 
 const app = express();
 
@@ -14,11 +10,28 @@ app.get("/", (req, res) => {
   res.send("ETF Simulator API");
 });
 
-app.use("/transactions", transactionRoutes);
-app.use("/portfolios", portfolioRoutes);
-app.use("/assets", assetRoutes);
-app.use("/allocations", allocationRoutes);
+// Avoid loading prisma until DATABASE_URL exists (otherwise process exits on import).
+if (process.env.DATABASE_URL) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const transactionRoutes = require("./routes/transaction.route").default;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const portfolioRoutes = require("./routes/portfolio.route").default;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const assetRoutes = require("./routes/asset.route").default;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const allocationRoutes = require("./routes/allocation.route").default;
 
-app.listen(4000, () => {
-  console.log("Server running on port 4000");
+  app.use("/transactions", transactionRoutes);
+  app.use("/portfolios", portfolioRoutes);
+  app.use("/assets", assetRoutes);
+  app.use("/allocations", allocationRoutes);
+} else {
+  console.warn(
+    "DATABASE_URL unset — only GET /. Set DATABASE_URL for full API.",
+  );
+}
+
+const port = Number(process.env.PORT) || 4000;
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Server running on port ${port}`);
 });
