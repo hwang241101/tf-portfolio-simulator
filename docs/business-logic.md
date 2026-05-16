@@ -1,5 +1,7 @@
 # Business Logic
 
+> 수익·리스크 지표(CAGR, MDD, Volatility, Sharpe) 및 AI Recommendation: [metrics-and-recommendations.md](./metrics-and-recommendations.md)
+
 ## Rebalancing
 
 목표 비율과 현재 비율의 차이를 계산하여 매수/매도 금액 산출
