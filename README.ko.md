@@ -5,13 +5,11 @@
 금융 포트폴리오·리밸런싱을 **시뮬레이션**하는 풀스택 웹 애플리케이션입니다.  
 실제 주문·실시간 시세 연동이 아닌, **목표 비율 대비 매수·매도 계획**과 **대시보드·리스크 관점**을 다루는 **포트폴리오용 프로젝트**입니다.
 
-| | |
-|---|---|
-| **Live Demo** | https://tf-portfolio-simulator.vercel.app |
-| **Demo Video** | [demo-full.mp4](./docs/assets/video/demo-full.mp4) _(아래)_ |
-| **UI 언어** | 일본어 (학습·데모 목적) |
-
-<video src="./docs/assets/video/demo-full.mp4" controls width="720"></video>
+|                |                                                             |
+| -------------- | ----------------------------------------------------------- |
+| **Live Demo**  | https://tf-portfolio-simulator.vercel.app                   |
+| **Demo Video** | [demo-full.mp4](https://github.com/hwang241101/tf-portfolio-simulator/blob/main/docs/assets/video/demo-full.mp4) _(클릭 시 GitHub에서 재생)_ |
+| **UI 언어**    | 일본어 (학습·데모 목적)                                     |
 
 > 촬영 목록·파일명: [docs/assets/README.ko.md](./docs/assets/README.ko.md)
 
@@ -26,19 +24,19 @@
 
 ### 주요 기능
 
-| 기능 | 설명 |
-|------|------|
-| **대시보드** | 포트폴리오 요약, 자산 구성·지표 시각화 |
-| **포트폴리오** | 시드된 포트폴리오·거래를 전제로, **투자 성향 프리셋**(공격·균형·안정형) **변경** 시 목표 배분(Allocation) 일괄 갱신, 거래(Transaction) 확인·추가·삭제 |
-| **리밸런싱** | 목표 비율 vs 현재 평가 기준 **Preview → Apply** (매수·매도 수량 산출) |
-| **리스크 분석** | CAGR·MDD·Volatility·Sharpe 등 지표, 차트, **규칙 기반 AI Recommendation**(LLM 미사용) |
+| 기능            | 설명                                                                                                                                                  |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **대시보드**    | 포트폴리오 요약, 자산 구성·지표 시각화                                                                                                                |
+| **포트폴리오**  | 시드된 포트폴리오·거래를 전제로, **투자 성향 프리셋**(공격·균형·안정형) **변경** 시 목표 배분(Allocation) 일괄 갱신, 거래(Transaction) 확인·추가·삭제 |
+| **리밸런싱**    | 목표 비율 vs 현재 평가 기준 **Preview → Apply** (매수·매도 수량 산출)                                                                                 |
+| **리스크 분석** | CAGR·MDD·Volatility·Sharpe 등 지표, 차트, **규칙 기반 AI Recommendation**(LLM 미사용)                                                                 |
 
 ### 화면 미리보기 (2×2)
 
-| 대시보드 | 리밸런싱 |
-|:---:|:---:|
-| ![대시보드](./docs/assets/screenshots/01-dashboard.png) | ![리밸런싱](./docs/assets/screenshots/04-rebalancing-preview.png) |
-| 리스크 지표 | AI Recommendation |
+|                                대시보드                                |                                        리밸런싱                                        |
+| :--------------------------------------------------------------------: | :------------------------------------------------------------------------------------: |
+|        ![대시보드](./docs/assets/screenshots/01-dashboard.png)         |           ![리밸런싱](./docs/assets/screenshots/04-rebalancing-preview.png)            |
+|                              리스크 지표                               |                                   AI Recommendation                                    |
 | ![리스크 지표](./docs/assets/screenshots/06-risk-analysis-metrics.png) | ![AI Recommendation](./docs/assets/screenshots/07-risk-analysis-ai-recommendation.png) |
 
 ### 역할
@@ -49,9 +47,9 @@
 
 앱 안의 **「AI Recommendation」**(규칙 기반 조언)과는 **별개**로, **이 레포를 만들 때** 아래 도구를 보조적으로 사용했습니다.
 
-| 도구 | 용도 |
-|------|------|
-| **[Cursor](https://cursor.com)** | IDE 내 코드 작성·리팩터링, EB/Vercel 배포 이슈 디버깅, README·docs 초안 |
+| 도구                                   | 용도                                                                                |
+| -------------------------------------- | ----------------------------------------------------------------------------------- |
+| **[Cursor](https://cursor.com)**       | IDE 내 코드 작성·리팩터링, EB/Vercel 배포 이슈 디버깅, README·docs 초안             |
 | **[ChatGPT](https://chat.openai.com)** | AWS·Prisma·네트워크(Mixed Content) 등 개념 정리, 에러 메시지 해석, 문서 문장 다듬기 |
 
 **본인이 한 일:** 요구사항 정의, 최종 코드·설정 검토, Beanstalk/RDS/Vercel 직접 조작, 시드·배포 검증.  
@@ -63,14 +61,14 @@
 
 ## 2. 기술 선택 (Why & 기대 효과)
 
-| 기술 | 선택 이유 | 기대·실제 결과 |
-|------|-----------|----------------|
-| **Next.js 16 (App Router)** | 대시보드·다중 페이지, 배포 친화적 SSR/라우팅 | 화면별 라우트 분리, Vercel 원클릭 배포 |
-| **TypeScript** | 프론트·백 타입 안정성, 포트폴리오 코드 품질 | API 응답·도메인 타입 공유 (`frontend/app/types`) |
-| **MUI + MUI X Charts** | 테이블·차트·폼을 빠르게 구성 | 대시보드·리스크 화면 시각화 |
-| **Express 5** | 익숙한 REST API, 가벼운 백엔드 | 포트폴리오·거래·리밸런싱 엔드포인트 |
-| **Prisma 7 + MySQL** | 스키마·마이그레이션·타입 생성 | RDS 연동, `seed`로 데모 데이터 |
-| **Zod** | 요청 바디 검증 | 잘못된 입력 조기 차단 |
+| 기술                        | 선택 이유                                    | 기대·실제 결과                                   |
+| --------------------------- | -------------------------------------------- | ------------------------------------------------ |
+| **Next.js 16 (App Router)** | 대시보드·다중 페이지, 배포 친화적 SSR/라우팅 | 화면별 라우트 분리, Vercel 원클릭 배포           |
+| **TypeScript**              | 프론트·백 타입 안정성, 포트폴리오 코드 품질  | API 응답·도메인 타입 공유 (`frontend/app/types`) |
+| **MUI + MUI X Charts**      | 테이블·차트·폼을 빠르게 구성                 | 대시보드·리스크 화면 시각화                      |
+| **Express 5**               | 익숙한 REST API, 가벼운 백엔드               | 포트폴리오·거래·리밸런싱 엔드포인트              |
+| **Prisma 7 + MySQL**        | 스키마·마이그레이션·타입 생성                | RDS 연동, `seed`로 데모 데이터                   |
+| **Zod**                     | 요청 바디 검증                               | 잘못된 입력 조기 차단                            |
 
 > 상세 설계 의도: [docs/architecture.ko.md](./docs/architecture.ko.md)
 
@@ -96,13 +94,13 @@
 
 ![아키텍처](./docs/assets/diagrams/08-architecture-aws-vercel.png)
 
-| 구성 요소 | 역할 |
-|-----------|------|
-| **Vercel** | 프론트 호스팅, HTTPS 제공 |
-| **`/api-proxy`** | Vercel(HTTPS) → Beanstalk(HTTP) **Mixed Content** 우회, 동일 출처 API 호출 |
-| **Elastic Beanstalk** | Express API zip 배포, `npm install` + `node dist/src/app.js` |
-| **RDS (MySQL)** | 포트폴리오·거래·배분 영속화 |
-| **환경 변수** | EB: `DATABASE_URL` / Vercel: `API_PROXY_TARGET` (또는 EB URL fallback) |
+| 구성 요소             | 역할                                                                       |
+| --------------------- | -------------------------------------------------------------------------- |
+| **Vercel**            | 프론트 호스팅, HTTPS 제공                                                  |
+| **`/api-proxy`**      | Vercel(HTTPS) → Beanstalk(HTTP) **Mixed Content** 우회, 동일 출처 API 호출 |
+| **Elastic Beanstalk** | Express API zip 배포, `npm install` + `node dist/src/app.js`               |
+| **RDS (MySQL)**       | 포트폴리오·거래·배분 영속화                                                |
+| **환경 변수**         | EB: `DATABASE_URL` / Vercel: `API_PROXY_TARGET` (또는 EB URL fallback)     |
 
 ### 배포·운영에서 겪은 점 (요약)
 
@@ -150,15 +148,14 @@ etf-simulator/
 
 ### 화면 스크린샷
 
-| 순서 | 파일 | 들어갈 그림 내용 |
-|------|------|------------------|
-| 1 | `docs/assets/screenshots/01-dashboard.png` | 대시보드 — 총평가·CAGR/MDD·구성 차트 전체 |
-| 2 | `docs/assets/screenshots/02-portfolio-preset.png` | 포트폴리오 — 투자 성향 프리셋 선택/적용 UI |
-| 3 | `docs/assets/screenshots/03-portfolio-allocation-transactions.png` | 포트폴리오 — 배분·거래 테이블 |
-| 4 | `docs/assets/screenshots/04-rebalancing-preview.png` | 리밸런싱 — Preview BUY/SELL 목록 |
-| 5 | `docs/assets/screenshots/05-rebalancing-after-apply.png` | 리밸런싱 — Apply 후 |
-| 6 | `docs/assets/screenshots/06-risk-analysis-metrics.png` | 리스크 분석 — 지표 카드·차트 |
-| 7 | `docs/assets/screenshots/07-risk-analysis-ai-recommendation.png` | 리스크 분석 — AI Recommendation 카드 |
+| 순서 | 파일                                                               | 들어갈 그림 내용                           |
+| ---- | ------------------------------------------------------------------ | ------------------------------------------ |
+| 1    | `docs/assets/screenshots/01-dashboard.png`                         | 대시보드 — 총평가·CAGR/MDD·구성 차트 전체  |
+| 2    | `docs/assets/screenshots/02-portfolio-preset.png`                  | 포트폴리오 — 투자 성향 프리셋 선택/적용 UI |
+| 3    | `docs/assets/screenshots/03-portfolio-allocation-transactions.png` | 포트폴리오 — 배분·거래 테이블              |
+| 4    | `docs/assets/screenshots/04-rebalancing-preview.png`               | 리밸런싱 — Preview BUY/SELL 목록           |
+| 5    | `docs/assets/screenshots/06-risk-analysis-metrics.png`             | 리스크 분석 — 지표 카드·차트               |
+| 6    | `docs/assets/screenshots/07-risk-analysis-ai-recommendation.png`   | 리스크 분석 — AI Recommendation 카드       |
 
 #### 대시보드
 
@@ -175,10 +172,6 @@ etf-simulator/
 #### 리밸런싱 — Preview
 
 ![04-rebalancing-preview](./docs/assets/screenshots/04-rebalancing-preview.png)
-
-#### 리밸런싱 — Apply 후
-
-![05-rebalancing-after-apply](./docs/assets/screenshots/05-rebalancing-after-apply.png)
 
 #### 리스크 분석 — 지표
 
@@ -210,21 +203,21 @@ etf-simulator/
 
 ### 의도적으로 단순화한 부분 (한계)
 
-| 항목 | 현재 | 이유 |
-|------|------|------|
-| 시세 | Mock / 마지막 거래가 | 외부 API·라이선스 범위 밖에서 로직 검증 우선 |
-| 수수료·세금 | 미반영 | 시뮬레이터 범위 축소 |
-| 환율 | 기본 통화(JPY) 중심 | NISA·엔화 투자 시나리오는 향후 확장 |
-| 리스크 프리셋 | 프론트 localStorage + UI | 빠른 UX 데모, 서버 정책 엔진은 미구현 |
+| 항목          | 현재                     | 이유                                         |
+| ------------- | ------------------------ | -------------------------------------------- |
+| 시세          | Mock / 마지막 거래가     | 외부 API·라이선스 범위 밖에서 로직 검증 우선 |
+| 수수료·세금   | 미반영                   | 시뮬레이터 범위 축소                         |
+| 환율          | 기본 통화(JPY) 중심      | NISA·엔화 투자 시나리오는 향후 확장          |
+| 리스크 프리셋 | 프론트 localStorage + UI | 빠른 UX 데모, 서버 정책 엔진은 미구현        |
 
 ### 지표 · AI Recommendation (요약)
 
-| 지표 | 한 줄 설명 | 계산 위치 |
-|------|-----------|-----------|
-| **CAGR** | 투자 기간 성장을 연율로 환산 | 백엔드 (BUY 합계·현재 평가·기간) |
-| **MDD** | 고점 대비 최대 하락률 | 백엔드 (거래 시점 평가 곡선) |
-| **Volatility** | 평가액 흔들림(연율 %) | 프론트 (`valueHistory` 수익률 × √252) |
-| **Sharpe** | 변동 대비 수익 효율(무위험 0% 가정) | 프론트 |
+| 지표           | 한 줄 설명                          | 계산 위치                             |
+| -------------- | ----------------------------------- | ------------------------------------- |
+| **CAGR**       | 투자 기간 성장을 연율로 환산        | 백엔드 (BUY 합계·현재 평가·기간)      |
+| **MDD**        | 고점 대비 최대 하락률               | 백엔드 (거래 시점 평가 곡선)          |
+| **Volatility** | 평가액 흔들림(연율 %)               | 프론트 (`valueHistory` 수익률 × √252) |
+| **Sharpe**     | 변동 대비 수익 효율(무위험 0% 가정) | 프론트                                |
 
 **AI Recommendation**은 `/risk-analysis` 하단 카드와 대시보드 **한 줄 인사이트**로 표시됩니다.  
 **LLM이 아니라** MDD·Volatility·Sharpe·종목 집중도가 임계값을 넘으면 **미리 정의한 문구**를 최대 3건 보여 주는 **규칙 엔진**입니다.
@@ -372,14 +365,14 @@ npx prisma studio
 
 ## 문서
 
-| 문서 | 내용 |
-|------|------|
-| [architecture.ko.md](./docs/architecture.ko.md) | 설계 의도·데이터 흐름 |
-| [business-logic.ko.md](./docs/business-logic.ko.md) | 리밸런싱 수식 |
+| 문서                                                                          | 내용                                                |
+| ----------------------------------------------------------------------------- | --------------------------------------------------- |
+| [architecture.ko.md](./docs/architecture.ko.md)                               | 설계 의도·데이터 흐름                               |
+| [business-logic.ko.md](./docs/business-logic.ko.md)                           | 리밸런싱 수식                                       |
 | [metrics-and-recommendations.ko.md](./docs/metrics-and-recommendations.ko.md) | CAGR·MDD·Volatility·Sharpe, AI Recommendation(규칙) |
-| [backend.ko.md](./docs/backend.ko.md) | API·배포 |
-| [frontend.ko.md](./docs/frontend.ko.md) | 화면·상태 |
-| [assets/README.ko.md](./docs/assets/README.ko.md) | 스크린샷·동영상 파일명·촬영 가이드 |
+| [backend.ko.md](./docs/backend.ko.md)                                         | API·배포                                            |
+| [frontend.ko.md](./docs/frontend.ko.md)                                       | 화면·상태                                           |
+| [assets/README.ko.md](./docs/assets/README.ko.md)                             | 스크린샷·동영상 파일명·촬영 가이드                  |
 
 > 각 `docs/*.ko.md`는 한국어, `docs/*.md`는 일본어입니다. 루트 README 일본어 버전은 [README.md](./README.md)입니다.
 
