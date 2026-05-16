@@ -1,6 +1,8 @@
 # Backend
 
-## 1. Data Model
+[한국어](./backend.ko.md)
+
+## 1. データモデル
 
 - User
 - Portfolio
@@ -8,19 +10,19 @@
 - Allocation
 - Transaction
 
-## 2. Tech Stack
+## 2. 技術スタック
 
 - Node.js
 - Express
 - Prisma
 
-## 3. API Design
+## 3. API 設計
 
 - POST /transactions
 - GET /portfolio
 - POST /rebalance
 
-## 4. Key Logic
+## 4. 主要ロジック
 
-- Portfolio value calculation
-- Rebalancing algorithm
+- ポートフォリオ評価額の計算
+- リバランスアルゴリズム

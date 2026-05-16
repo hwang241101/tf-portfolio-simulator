@@ -1,187 +1,189 @@
-# 지표 · AI Recommendation
+# 指標 · AI Recommendation
 
-대시보드·리스크 분석 화면에서 쓰는 **수익·리스크 지표**와 **AI Recommendation**의 의미, 계산 방식, 한계를 정리합니다.
+[한국어](./metrics-and-recommendations.ko.md)
 
-> **공통 전제:** 평가 가격은 `backend/src/services/price.service.ts`의 **Mock 현재가**입니다. 실시간 시장 시세·환율·수수료·세금은 반영하지 않습니다.
+ダッシュボード・リスク分析画面で使う**収益・リスク指標**と **AI Recommendation** の意味、計算方法、限界をまとめます。
 
----
-
-## 1. 지표가 계산되는 위치
-
-| 지표 | 계산 위치 | 입력 데이터 |
-|------|-----------|-------------|
-| **CAGR**, **MDD**, `valueHistory` | 백엔드 `getPortfolioSummary` | 거래(Transaction) 시퀀스 + Mock 가격 |
-| **Volatility**, **Sharpe**, **Sortino**, **Calmar** | 프론트 `risk-analysis/page.tsx` | API가 준 `valueHistory`·`cagr`·`mdd` |
-| **Volatility**, **Sharpe** (요약) | 프론트 `PortfolioSummarySection.tsx` | 동일 `valueHistory` 기반 |
-
-백엔드는 **포트폴리오 요약 API 한 번**으로 핵심 시계열을 만들고, 프론트는 그 위에서 **리스크 분석용 2차 지표**를 붙입니다.
+> **共通前提:** 評価価格は `backend/src/services/price.service.ts` の **Mock 現在価**です。リアルタイム市場相場・為替・手数料・税金は反映しません。
 
 ---
 
-## 2. 지표 용어 · 공식
+## 1. 指標が計算される場所
 
-### 2.1 CAGR (Compound Annual Growth Rate, 연평균 성장률)
+| 指標 | 計算場所 | 入力データ |
+|------|----------|------------|
+| **CAGR**, **MDD**, `valueHistory` | バックエンド `getPortfolioSummary` | 取引（Transaction）シーケンス + Mock 価格 |
+| **Volatility**, **Sharpe**, **Sortino**, **Calmar** | フロント `risk-analysis/page.tsx` | API の `valueHistory`・`cagr`・`mdd` |
+| **Volatility**, **Sharpe**（概要） | フロント `PortfolioSummarySection.tsx` | 同じ `valueHistory` ベース |
 
-**의미:** 투자 기간 전체의 성장을 **1년 단위 수익률**로 환산한 값입니다. “연복리로 몇 % 불었는가”에 가깝게 읽습니다.
+バックエンドは**ポートフォリオ概要 API 1 回**でコア時系列を作り、フロントはその上に**リスク分析用の 2 次指標**を載せます。
 
-**구현:** `backend/src/controllers/portfolio.controller.ts`
+---
+
+## 2. 指標の用語 · 式
+
+### 2.1 CAGR (Compound Annual Growth Rate, 年平均成長率)
+
+**意味:** 投資期間全体の成長を**年率 1 本**に換算した値。「複利で年何 % 増えたか」に近く読めます。
+
+**実装:** `backend/src/controllers/portfolio.controller.ts`
 
 ```
-투자원금 = 모든 BUY 거래의 (수량 × 단가) 합
-ratio    = 현재 총평가액 / 투자원금
-years    = (현재 시각 − 최초 거래일) / 365.25일
+投資元本 = すべての BUY 取引の (数量 × 単価) の合計
+ratio    = 現在の総評価額 / 投資元本
+years    = (現在時刻 − 最初の取引日) / 365.25 日
 
-years < 0.25 (약 3개월 미만):
-  CAGR ≈ ratio − 1          # 기간이 짧아 연율화가 과도하게 튜는 것을 방지
+years < 0.25（約 3 ヶ月未満）:
+  CAGR ≈ ratio − 1          # 期間が短く年率化が過大になるのを防ぐ
 
-그 외:
+それ以外:
   CAGR = ratio^(1 / years) − 1
 ```
 
-**한계**
+**限界**
 
-- **매도로 인출한 현금·추가 입금**을 별도 현금흐름으로 보정하지 않습니다 (총 BUY 금액을 원금으로 봄).
-- **현재가는 Mock**이라 실제 ETF 수익률과 다릅니다.
+- **売却による引出し・追加入金**を別のキャッシュフローで補正しません（BUY 合計を元本とみなす）。
+- **現在価は Mock** のため実際の ETF 収益率と異なります。
 
 ---
 
-### 2.2 MDD (Maximum Drawdown, 최대 낙폭)
+### 2.2 MDD (Maximum Drawdown, 最大ドローダウン)
 
-**의미:** 과거 **고점(피크)** 대비 가장 크게 떨어진 비율입니다. 음수로 표시되며, **−25%**는 “고점에서 최대 25%까지 하락했다”는 뜻입니다.
+**意味:** 過去の**ピーク**から最も大きく落ちた比率。負で表示され、**−25%** は「ピークから最大 25% 下落した」意味です。
 
-**구현:** 백엔드, 거래가 발생할 때마다 포트폴리오 총평가 스냅샷을 쌓은 뒤:
+**実装:** バックエンド。取引のたびにポートフォリオ総評価スナップショットを積み:
 
 ```
-각 시점 평가액 V_t (거래 후 보유 수량 × Mock 현재가)
+各時点の評価額 V_t（取引後の保有数量 × Mock 現在価）
 peak = max(peak, V_t)
 drawdown_t = (V_t − peak) / peak
-MDD = min(drawdown_t)   # 가장 작은(가장 큰 하락) 값
+MDD = min(drawdown_t)   # 最も小さい（最大下落）値
 ```
 
-**참고:** 스냅샷 시점마다 **그 시점의 Mock 현재가**로 전체 포지션을 재평가합니다 (과거 시점 가격 고정이 아님). 학습용 **근사 MDD**입니다.
+**参考:** スナップショットごとに**その時点の Mock 現在価**で全ポジションを再評価します（過去価格固定ではない）。学習用の**近似 MDD**です。
 
 ---
 
-### 2.3 Volatility (연율 변동성)
+### 2.3 Volatility（年率ボラティリティ）
 
-**의미:** 평가액이 얼마나 **들쭉날쭉한지**를 나타냅니다. 값이 클수록 단기 손익의 폭이 넓다고 해석합니다.
+**意味:** 評価額がどれだけ**上下するか**。大きいほど短期損益の幅が広いと解釈します。
 
-**구현:** 프론트, `valueHistory` 인접 시점 수익률:
+**実装:** フロント、`valueHistory` 隣接時点のリターン:
 
 ```
 r_i = V_i / V_{i-1} − 1
-μ   = r 의 평균
-σ   = r 의 표준편차 (모집단 분산, n으로 나눔)
+μ   = r の平均
+σ   = r の標準偏差（母分散、n で割る）
 Volatility(%) = σ × √252 × 100
 ```
 
-`√252`는 **거래 스냅샷 간격을 거래일(252일) 기준으로 연율화**하는 단순 가정입니다. 실제 일별 종가가 아닙니다.
+`√252` は**取引スナップショット間隔を営業日 252 日基準で年率化**する単純仮定です。実際の日次終値ではありません。
 
-**대시보드·리스크 분석 공통 임계값 (UI)**
+**ダッシュボード・リスク分析共通の閾値（UI）**
 
-| 수준 | Volatility |
+| 水準 | Volatility |
 |------|------------|
 | HIGH | ≥ 22% |
 | MEDIUM | ≥ 15% |
-| LOW | 그 미만 |
+| LOW | それ未満 |
 
 ---
 
-### 2.4 Sharpe Ratio (샤프 비율, 단순형)
+### 2.4 Sharpe Ratio（シャープレシオ、簡易型）
 
-**의미:** **변동(리스크) 1단위당** 평균 수익이 얼마나 나왔는지 보는 지표입니다. 높을수록 “흔들림 대비 효율”이 좋다고 봅니다.
+**意味:** **変動（リスク）1 単位あたり**の平均リターン。高いほど「揺れに対する効率」がよいとみなします。
 
-**구현:**
+**実装:**
 
 ```
 Sharpe = (μ / σ) × √252
 ```
 
-- **무위험 수익률 0%** 가정 (국채 금리 미반영).
-- Volatility와 동일한 `r_i` 시퀀스 사용.
+- **無リスク金利 0%** 仮定（国債金利未反映）。
+- Volatility と同じ `r_i` 系列を使用。
 
-**임계값 (리스크 분석·대시보드 요약)**
+**閾値（リスク分析・ダッシュボード概要）**
 
-| 수준 | Sharpe |
+| 水準 | Sharpe |
 |------|--------|
-| HIGH (나쁨) | < 0.7 |
+| HIGH（悪い） | < 0.7 |
 | MEDIUM | < 1.0 |
-| LOW (양호) | ≥ 1.0 |
+| LOW（良好） | ≥ 1.0 |
 
 ---
 
-### 2.5 Sortino Ratio · Calmar Ratio (리스크 분석 전용)
+### 2.5 Sortino Ratio · Calmar Ratio（リスク分析専用）
 
-**Sortino:** 하락한 수익률만으로 하방 변동을 잰 뒤, Sharpe와 비슷하게 `μ / σ_down × √252`. 상승 변동은 “나쁜 변동”으로 치지 않습니다.
+**Sortino:** 下落したリターンだけで下方変動を測り、Sharpe と同様に `μ / σ_down × √252`。上昇変動は「悪い変動」とみなしません。
 
 **Calmar:**
 
 ```
-Calmar = |CAGR(%)| / |MDD(%)|    (MDD가 0이 아닐 때)
+Calmar = |CAGR(%)| / |MDD(%)|    （MDD ≠ 0 のとき）
 ```
 
-CAGR 대비 최대 낙폭이 얼마나 컸는지 보는 **단순 효율 지표**입니다.
+CAGR に対する最大下落がどれだけ大きかったかを見る**単純効率指標**です。
 
 ---
 
-## 3. AI Recommendation (규칙 기반 조언)
+## 3. AI Recommendation（ルールベースの助言）
 
-### 3.1 “AI”의 의미 (중요)
+### 3.1 「AI」の意味（重要）
 
-이 프로젝트의 **AI Recommendation은 LLM·외부 AI API를 사용하지 않습니다.**
+本プロジェクトの **AI Recommendation は LLM・外部 AI API を使いません。**
 
-- OpenAI 등 **모델 호출 없음**
-- **if–else 규칙**으로 지표가 임계값을 넘으면, 미리 작성된 일본어 문구를 붙입니다
-- UI 라벨은 “AI”이지만, 문서·면접에서는 **Rule-based recommendation / 규칙 기반 리스크 조언**으로 설명하는 것을 권장합니다
+- OpenAI 等の**モデル呼び出しなし**
+- **if–else ルール**で指標が閾値を超えると、事前に書いた**日本語**文言を付与
+- UI ラベルは「AI」ですが、ドキュメント・面接では **Rule-based recommendation / ルールベースのリスク助言** と説明することを推奨
 
-### 3.2 표시 위치
+### 3.2 表示場所
 
-| 위치 | 내용 |
+| 場所 | 内容 |
 |------|------|
-| **`/risk-analysis`** | **AI Recommendation** 카드 — 지표별 이유·권장·기대 효과(최대 3건) |
-| **`/dashboard`** | `aiInsightOneLiner` — 리스크 수준에 따른 **한 줄 요약** |
+| **`/risk-analysis`** | **AI Recommendation** カード — 指標別の理由・推奨・期待効果（最大 3 件） |
+| **`/dashboard`** | `aiInsightOneLiner` — リスク水準に応じた**一行サマリー** |
 
-구현: `frontend/app/risk-analysis/page.tsx` (`aiRecommendations` useMemo),  
-`frontend/app/dashboard/components/PortfolioSummarySection.tsx` (`aiInsightOneLiner`).
+実装: `frontend/app/risk-analysis/page.tsx`（`aiRecommendations` useMemo）、  
+`frontend/app/dashboard/components/PortfolioSummarySection.tsx`（`aiInsightOneLiner`）。
 
-### 3.3 판단 규칙 (우선순위대로 최대 3건)
+### 3.3 判定ルール（優先順、最大 3 件）
 
-| 조건 | level | indicator | 권장 방향 (요지) |
-|------|-------|-----------|------------------|
-| MDD ≤ **−25%** | high | MDD | 채권 ETF 비중 확대 등 하락 방어 |
-| Volatility ≥ **22%** | high | Volatility | 고변동 자산 비중 축소·분산 |
-| Sharpe < **0.7** | medium | Sharpe | 저상관 자산 추가로 효율 개선 |
-| 최대 종목 비중 ≥ **40%** | medium | Concentration | 상위 종목 35% 미만으로 리밸런싱 |
-| 위 조건 모두 해당 없음 | low | Overall | 정기 적립·월간 리밸런스 유지 |
+| 条件 | level | indicator | 推奨の方向（要旨） |
+|------|-------|-----------|-------------------|
+| MDD ≤ **−25%** | high | MDD | 債券 ETF 比率拡大など下落防御 |
+| Volatility ≥ **22%** | high | Volatility | 高ボラ資産の比率縮小・分散 |
+| Sharpe < **0.7** | medium | Sharpe | 低相関資産追加で効率改善 |
+| 最大銘柄比重 ≥ **40%** | medium | Concentration | 上位銘柄を 35% 未満へリバランス |
+| 上記すべて非該当 | low | Overall | 定期積立・月次リバランス維持 |
 
-`expectedEffect`에 나오는 “○%에서 △%로 개선 **見込み**”는 **시뮬레이션 카피**이며, 모델이 미래 수익을 예측한 값이 **아닙니다**.
+`expectedEffect` の「○% から △% に改善**見込み**」は**シミュレーション用コピー**であり、モデルが将来リターンを予測した値**ではありません**。
 
-### 3.4 대시보드 한 줄 인사이트
+### 3.4 ダッシュボード一行インサイト
 
-`riskSnapshot.level` (MDD·Volatility·Sharpe 종합)이 **HIGH / MEDIUM / LOW**일 때 고정 문구를 선택합니다. 리스크 분석 페이지의 상세 카드보다 **짧은 요약**입니다.
-
----
-
-## 4. 실무와의 차이 (면접·README용 한 줄)
-
-| 항목 | 본 프로젝트 | 실무에 가까운 방향 |
-|------|-------------|-------------------|
-| 가격 | Mock | Bloomberg / 거래소 API |
-| CAGR | BUY 합계 기준 단순 연율 | 현금흐름·배당·세후 |
-| MDD | 거래 시점 Mock 재평가 | 일별 시가총액 기준 |
-| Volatility | 거래 간격 수익률 × √252 | 일별 로그수익률 |
-| Sharpe | 무위험 0% | 국채·T-bill 차감 |
-| AI Recommendation | 규칙 엔진 | 리스크 모델·컴플라이언스 검토 |
+`riskSnapshot.level`（MDD・Volatility・Sharpe 総合）が **HIGH / MEDIUM / LOW** のとき固定文言を選択。リスク分析ページの詳細カードより**短い要約**です。
 
 ---
 
-## 5. 관련 코드 경로
+## 4. 実務との差（面接・README 用の一行）
+
+| 項目 | 本プロジェクト | 実務に近い方向 |
+|------|----------------|----------------|
+| 価格 | Mock | Bloomberg / 取引所 API |
+| CAGR | BUY 合計ベースの単純年率 | キャッシュフロー・配当・税後 |
+| MDD | 取引時点 Mock 再評価 | 日次時価総額ベース |
+| Volatility | 取引間隔リターン × √252 | 日次ログリターン |
+| Sharpe | 無リスク 0% | 国債・T-bill 控除 |
+| AI Recommendation | ルールエンジン | リスクモデル・コンプライアンス |
+
+---
+
+## 5. 関連コードパス
 
 ```
 backend/src/controllers/portfolio.controller.ts   # CAGR, MDD, valueHistory
-backend/src/services/price.service.ts             # Mock 가격
-frontend/app/risk-analysis/page.tsx               # 2차 지표, AI Recommendation
-frontend/app/dashboard/components/PortfolioSummarySection.tsx  # 요약 지표, 한 줄 인사이트
+backend/src/services/price.service.ts             # Mock 価格
+frontend/app/risk-analysis/page.tsx               # 2 次指標, AI Recommendation
+frontend/app/dashboard/components/PortfolioSummarySection.tsx  # 概要指標, 一行インサイト
 ```
 
-리밸런싱 로직은 [business-logic.md](./business-logic.md)를 참고하세요.
+リバランスロジックは [business-logic.md](./business-logic.md) を参照してください。

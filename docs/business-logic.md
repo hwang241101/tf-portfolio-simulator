@@ -1,15 +1,17 @@
 # Business Logic
 
-> 수익·리스크 지표(CAGR, MDD, Volatility, Sharpe) 및 AI Recommendation: [metrics-and-recommendations.md](./metrics-and-recommendations.md)
+[한국어](./business-logic.ko.md)
 
-## Rebalancing
+> 収益・リスク指標（CAGR, MDD, Volatility, Sharpe）と AI Recommendation: [metrics-and-recommendations.md](./metrics-and-recommendations.md)
 
-목표 비율과 현재 비율의 차이를 계산하여 매수/매도 금액 산출
+## Rebalancing（リバランス）
+
+目標比率と現在比率の差から売買金額を算出します。
 
 ### Formula
 
-목표 금액 = 전체 자산 × 목표 비율  
-차이 = 목표 금액 - 현재 금액
+目標金額 = 全体資産 × 目標比率  
+差分 = 目標金額 − 現在金額
 
-- - → BUY
-- - → SELL
+- 差分 > 0 → **BUY**
+- 差分 < 0 → **SELL**

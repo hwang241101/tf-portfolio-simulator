@@ -1,16 +1,19 @@
-# 미디어 에셋 가이드
+# メディアアセットガイド
 
-README·포트폴리오에 넣을 **스크린샷·동영상·다이어그램** 파일명과 촬영 내용입니다.  
-파일을 해당 경로에 넣은 뒤, 루트 [README.md](../../README.md)의 `<!-- MEDIA: ... -->` 주석 위치에 맞게 연결하면 됩니다.
+[한국어](./README.ko.md)
 
-## 폴더 구조
+README・ポートフォリオ用の**スクリーンショット・動画・図**のファイル名と撮影内容です。  
+ファイルを所定パスに置き、ルート [README.md](../../README.md) に接続します。
+
+## フォルダ構造
 
 ```
 docs/assets/
-├── README.md                 ← 이 파일 (촬영 가이드)
+├── README.md                 ← 日本語（このファイル）
+├── README.ko.md              ← 韓国語
 ├── video/
-│   ├── demo-full.mp4         ← 메인 데모 영상 (GitHub·README 상단)
-│   └── demo-full-poster.png  ← 영상 썸네일 (선택)
+│   ├── demo-full.mp4         ← メインデモ動画（GitHub・README 上部）
+│   └── demo-full-poster.png  ← 動画サムネイル（任意）
 ├── screenshots/
 │   ├── 01-dashboard.png
 │   ├── 02-portfolio-preset.png
@@ -23,31 +26,31 @@ docs/assets/
     └── 08-architecture-aws-vercel.png
 ```
 
-## 파일별 촬영 내용
+## ファイル別の撮影内容
 
-| 파일 | 넣을 내용 (촬영 시 화면) |
-|------|---------------------------|
-| **video/demo-full.mp4** | **60~90초** 흐름: 대시보드 → 포트폴리오(프리셋 변경) → 리밸런싱 Preview·Apply → 리스크 분석·AI Recommendation. Vercel Live URL, 데이터 로드된 상태. |
-| **video/demo-full-poster.png** | 영상 첫 프레임 또는 대시보드 대표 화면 (GitHub에서 영상 로딩 전 표시용, 선택) |
-| **screenshots/01-dashboard.png** | `/dashboard` — 총평가액·CAGR·MDD·자산 구성 차트·리스크 요약이 보이는 전체 화면 |
-| **screenshots/02-portfolio-preset.png** | `/portfolio` — 투자 성향 프리셋(積極/均衡/安定) 선택 UI 또는 적용 확인 다이얼로그 |
-| **screenshots/03-portfolio-allocation-transactions.png** | `/portfolio` — 목표 배분(Allocation) + 거래(Transaction) 탭/테이블이 보이는 화면 |
-| **screenshots/04-rebalancing-preview.png** | `/rebalancing` — Preview 결과, BUY/SELL 목록·수량·금액이 보이는 상태 |
-| **screenshots/05-rebalancing-after-apply.png** | Apply 직후 성공 토스트 또는 동일 화면에서 적용 후 변화(선택, 04와 쌍) |
-| **screenshots/06-risk-analysis-metrics.png** | `/risk-analysis` — Volatility·CAGR·Sharpe·Calmar 카드 + 성장/낙폭 차트 |
-| **screenshots/07-risk-analysis-ai-recommendation.png** | `/risk-analysis` 하단 — **AI Recommendation** 카드(지표·권장·기대 효과)가 보이게 |
-| **diagrams/08-architecture-aws-vercel.png** | 아키텍처 다이어그램: Browser → Vercel(HTTPS) → `/api-proxy` → EB → RDS (Figma/Excalidraw 등) |
+| ファイル | 入れる内容（撮影時の画面） |
+|----------|---------------------------|
+| **video/demo-full.mp4** | **60〜90 秒**: ダッシュボード → ポートフォリオ（プリセット変更）→ リバランス Preview·Apply → リスク分析·AI Recommendation。Vercel 本番 URL、データ読み込み済み。 |
+| **video/demo-full-poster.png** | 動画の最初のフレームまたはダッシュボード代表画面（GitHub で動画読み込み前に表示、任意） |
+| **screenshots/01-dashboard.png** | `/dashboard` — 総評価・CAGR·MDD·資産構成チャート・リスク概要が見える全体 |
+| **screenshots/02-portfolio-preset.png** | `/portfolio` — 投資スタイルプリセット（積極/均衡/安定）選択 UI または適用確認ダイアログ |
+| **screenshots/03-portfolio-allocation-transactions.png** | `/portfolio` — 目標配分（Allocation）+ 取引（Transaction）タブ/テーブル |
+| **screenshots/04-rebalancing-preview.png** | `/rebalancing` — Preview 結果、BUY/SELL 一覧・数量・金額 |
+| **screenshots/05-rebalancing-after-apply.png** | Apply 直後のトーストまたは適用後の変化（任意、04 と対） |
+| **screenshots/06-risk-analysis-metrics.png** | `/risk-analysis` — Volatility·CAGR·Sharpe·Calmar カード + 成長/ドローダウンチャート |
+| **screenshots/07-risk-analysis-ai-recommendation.png** | `/risk-analysis` 下部 — **AI Recommendation** カード（指標・推奨・期待効果） |
+| **diagrams/08-architecture-aws-vercel.png** | アーキテクチャ図: Browser → Vercel(HTTPS) → `/api-proxy` → EB → RDS（Figma/Excalidraw 等） |
 
-## 권장 사양
+## 推奨仕様
 
-| 항목 | 권장 |
+| 項目 | 推奨 |
 |------|------|
-| 스크린샷 | PNG, 가로 **1280~1440px**, Retina 2x 가능 |
-| 동영상 | MP4(H.264), **1080p 이하**, 30~60초면 README용으로 충분 |
-| GIF | README용은 **10MB 이하** (크면 MP4만 링크) |
+| スクリーンショット | PNG、幅 **1280〜1440px**、Retina 2x 可 |
+| 動画 | MP4(H.264)、**1080p 以下**、30〜60 秒で README 用に十分 |
+| GIF | README 用は **10MB 以下**（大きい場合は MP4 のみリンク） |
 
-## 촬영 팁
+## 撮影のコツ
 
-- 브라우저: **시크릿 창** 또는 북마크바 숨김, Vercel **Production URL**
-- 포트폴리오: 시드 데이터 있는 **#1 또는 #4**
-- 일본어 UI 그대로 두면 데모와 README 설명이 일치함
+- ブラウザ: **シークレット**またはブックマークバー非表示、Vercel **Production URL**
+- ポートフォリオ: シードデータのある **#1 または #4**
+- 日本語 UI のままにするとデモと README の説明が一致します
