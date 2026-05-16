@@ -3,9 +3,20 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 function getTargetBase(): string | null {
-  const raw = process.env.API_PROXY_TARGET?.trim();
-  if (!raw) return null;
-  return raw.replace(/\/$/, "");
+  const candidates = [
+    process.env.API_PROXY_TARGET,
+    process.env.NEXT_PUBLIC_API_BASE_URL,
+  ];
+
+  for (const value of candidates) {
+    const raw = value?.trim();
+    if (!raw || raw.startsWith("/")) continue;
+    if (raw.startsWith("http://") || raw.startsWith("https://")) {
+      return raw.replace(/\/$/, "");
+    }
+  }
+
+  return null;
 }
 
 async function proxy(
@@ -15,7 +26,10 @@ async function proxy(
   const targetBase = getTargetBase();
   if (!targetBase) {
     return NextResponse.json(
-      { error: "API_PROXY_TARGET is not set on the server" },
+      {
+        error:
+          "Set API_PROXY_TARGET (or NEXT_PUBLIC_API_BASE_URL to your EB http URL) in Vercel, then redeploy",
+      },
       { status: 503 },
     );
   }
