@@ -8,11 +8,21 @@ import type {
   TransactionListResponse,
 } from "../types";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000";
+function getApiBase(): string {
+  const configured = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "");
+
+  if (typeof window !== "undefined" && window.location.protocol === "https:") {
+    // Vercel(HTTPS) → EB(HTTP) direct calls are blocked (mixed content).
+    if (!configured || configured.startsWith("http://")) {
+      return "/api-proxy";
+    }
+  }
+
+  return configured ?? "http://localhost:4000";
+}
 
 export async function fetchPortfolios(): Promise<PortfolioListItem[]> {
-  const response = await fetch(`${API_BASE}/portfolios`);
+  const response = await fetch(`${getApiBase()}/portfolios`);
   const data = await response.json();
 
   if (!response.ok) {
@@ -23,7 +33,7 @@ export async function fetchPortfolios(): Promise<PortfolioListItem[]> {
 }
 
 export async function fetchAssets(): Promise<AssetListItem[]> {
-  const response = await fetch(`${API_BASE}/assets`);
+  const response = await fetch(`${getApiBase()}/assets`);
   const data = await response.json();
 
   if (!response.ok) {
@@ -36,7 +46,7 @@ export async function fetchAssets(): Promise<AssetListItem[]> {
 export async function fetchPortfolioSummary(
   portfolioId: string
 ): Promise<PortfolioSummary> {
-  const response = await fetch(`${API_BASE}/portfolios/${portfolioId}/summary`);
+  const response = await fetch(`${getApiBase()}/portfolios/${portfolioId}/summary`);
   const data = await response.json();
 
   if (!response.ok) {
@@ -52,7 +62,7 @@ export async function fetchTransactions(
   pageSize = 10
 ): Promise<TransactionListResponse> {
   const response = await fetch(
-    `${API_BASE}/transactions?portfolioId=${portfolioId}&page=${page}&pageSize=${pageSize}`
+    `${getApiBase()}/transactions?portfolioId=${portfolioId}&page=${page}&pageSize=${pageSize}`
   );
   const data = await response.json();
 
@@ -70,7 +80,7 @@ export async function createTransactionApi(input: {
   quantity: number;
   price: number;
 }): Promise<Transaction> {
-  const response = await fetch(`${API_BASE}/transactions`, {
+  const response = await fetch(`${getApiBase()}/transactions`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
@@ -85,7 +95,7 @@ export async function createTransactionApi(input: {
 }
 
 export async function deleteTransactionApi(id: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/transactions/${id}`, {
+  const response = await fetch(`${getApiBase()}/transactions/${id}`, {
     method: "DELETE",
   });
 
@@ -99,7 +109,7 @@ export async function fetchAllocations(
   portfolioId: string
 ): Promise<AllocationItem[]> {
   const response = await fetch(
-    `${API_BASE}/allocations?portfolioId=${portfolioId}`
+    `${getApiBase()}/allocations?portfolioId=${portfolioId}`
   );
   const data = await response.json();
   if (!response.ok) {
@@ -113,7 +123,7 @@ export async function saveAllocationApi(input: {
   assetId: number;
   targetRatio: number;
 }): Promise<AllocationItem> {
-  const response = await fetch(`${API_BASE}/allocations`, {
+  const response = await fetch(`${getApiBase()}/allocations`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
@@ -126,7 +136,7 @@ export async function saveAllocationApi(input: {
 }
 
 export async function deleteAllocationApi(id: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/allocations/${id}`, {
+  const response = await fetch(`${getApiBase()}/allocations/${id}`, {
     method: "DELETE",
   });
   const data = await response.json();
@@ -139,7 +149,7 @@ export async function previewRebalanceApi(
   portfolioId: string
 ): Promise<RebalanceItem[]> {
   const response = await fetch(
-    `${API_BASE}/portfolios/${portfolioId}/rebalance/preview`,
+    `${getApiBase()}/portfolios/${portfolioId}/rebalance/preview`,
     {
       method: "POST",
     }
@@ -155,7 +165,7 @@ export async function applyRebalanceApi(portfolioId: string): Promise<{
   appliedCount: number;
 }> {
   const response = await fetch(
-    `${API_BASE}/portfolios/${portfolioId}/rebalance/apply`,
+    `${getApiBase()}/portfolios/${portfolioId}/rebalance/apply`,
     {
       method: "POST",
     }

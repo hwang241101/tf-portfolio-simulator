@@ -9,6 +9,7 @@
     "build": "prisma generate && tsc",
     "start": "node dist/src/app.js",
     "postinstall": "prisma generate",
+    "db:seed": "prisma db seed",
     "zip:eb": "npm run build && zip -r ../etf-api-deploy.zip . -x 'node_modules/*' -x '.env' -x '*.zip' -x '.git/*'"
   },
   "keywords": [],
