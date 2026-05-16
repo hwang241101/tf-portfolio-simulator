@@ -5,11 +5,11 @@
 金融ポートフォリオとリバランスを**シミュレーション**するフルスタック Web アプリケーションです。  
 実際の注文やリアルタイム相場連携ではなく、**目標比率に対する売買計画**と**ダッシュボード・リスクの可視化**に焦点を当てた**ポートフォリオ用プロジェクト**です。
 
-|               |                                                            |
-| ------------- | ---------------------------------------------------------- |
-| **Live Demo** | https://tf-portfolio-simulator.vercel.app                  |
-| **デモ動画**  | [demo-full.mp4](https://github.com/hwang241101/tf-portfolio-simulator/blob/main/docs/assets/video/demo-full.mp4)（クリックして GitHub 上で再生） |
-| **UI 言語**   | 日本語（学習・デモ目的）                                   |
+|               |                                                                                                                  |
+| ------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **Live Demo** | https://tf-portfolio-simulator.vercel.app                                                                        |
+| **デモ動画**  | [demo-full.mp4](https://github.com/hwang241101/tf-portfolio-simulator/blob/main/docs/assets/video/demo-full.mp4) |
+| **UI 言語**   | 日本語（学習・デモ目的）                                                                                         |
 
 > 撮影一覧・ファイル名: [docs/assets/README.md](./docs/assets/README.md)
 
@@ -77,20 +77,6 @@
 ## 3. インフラ & デプロイ
 
 ローカル開発と**本番に近いデプロイ**を分離して構成しました。
-
-```
-[ブラウザ]
-    │  HTTPS
-    ▼
-[Vercel — Next.js]
-    │  /api-proxy/*  (サーバー Route Handler)
-    │  HTTP
-    ▼
-[AWS Elastic Beanstalk — Node.js API]
-    │
-    ▼
-[AWS RDS — MySQL]
-```
 
 ![アーキテクチャ](./docs/assets/diagrams/08-architecture-aws-vercel.png)
 
