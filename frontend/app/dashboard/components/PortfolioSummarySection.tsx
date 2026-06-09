@@ -637,6 +637,8 @@ export function PortfolioSummarySection({
                     outerRadius: 100,
                     paddingAngle: 2,
                     cornerRadius: 4,
+                    valueFormatter: (item) =>
+                      `${formatUpTo4(Number(item.value ?? 0))}%`,
                     data: chartPositions.map((position, idx) => ({
                       ...position,
                       color:
