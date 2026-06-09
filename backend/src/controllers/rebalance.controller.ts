@@ -64,18 +64,48 @@ async function buildRebalancePlan(
 
   const totalValue = [...byAsset.values()]
     .filter((v) => v.netQuantity > 0)
-    .reduce((sum, v) => sum + v.netQuantity * v.lastPrice, 0);
+    .reduce(
+      (sum, v) =>
+        sum +
+        v.netQuantity *
+          getMockCurrentPriceByTicker(
+            v.ticker,
+            v.lastPrice > 0 ? v.lastPrice : 100,
+          ),
+      0,
+    );
 
   if (totalValue <= 0) {
     return [];
   }
 
+  const targetByAssetId = new Map(
+    allocations.map((allocation) => [
+      allocation.assetId.toString(),
+      Number(allocation.targetRatio),
+    ]),
+  );
+
+  const assetIdsToProcess = new Set([
+    ...allocations.map((allocation) => allocation.assetId.toString()),
+    ...[...byAsset.entries()]
+      .filter(([, value]) => value.netQuantity > 0)
+      .map(([assetId]) => assetId),
+  ]);
+
   const plan: RebalanceAction[] = [];
 
-  for (const allocation of allocations) {
-    const key = allocation.assetId.toString();
-    const current = byAsset.get(key) ?? {
-      ticker: allocation.asset.ticker,
+  for (const key of assetIdsToProcess) {
+    const targetRatioDecimal = targetByAssetId.get(key) ?? 0;
+    const allocation = allocations.find(
+      (item) => item.assetId.toString() === key,
+    );
+    const held = byAsset.get(key);
+    const ticker = held?.ticker ?? allocation?.asset.ticker;
+    if (!ticker) continue;
+
+    const current = held ?? {
+      ticker,
       netQuantity: 0,
       lastPrice: 100,
     };
@@ -84,10 +114,10 @@ async function buildRebalancePlan(
       current.lastPrice > 0 ? current.lastPrice : 100,
     );
     const currentValue = Math.max(0, current.netQuantity) * price;
-    const targetValue = totalValue * Number(allocation.targetRatio);
+    const targetValue = totalValue * targetRatioDecimal;
     const diff = targetValue - currentValue;
     const currentRatio = round4((currentValue / totalValue) * 100);
-    const targetRatio = round4(Number(allocation.targetRatio) * 100);
+    const targetRatio = round4(targetRatioDecimal * 100);
 
     // 소액 노이즈는 제외
     if (Math.abs(diff) < 0.01) {

@@ -7,6 +7,8 @@ import type {
   Transaction,
   TransactionListResponse,
 } from "../types";
+import { useMockApi } from "./mock-mode";
+import * as mockApi from "./mock";
 
 function getApiBase(): string {
   const configured = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "");
@@ -22,6 +24,8 @@ function getApiBase(): string {
 }
 
 export async function fetchPortfolios(): Promise<PortfolioListItem[]> {
+  if (useMockApi()) return mockApi.mockFetchPortfolios();
+
   const response = await fetch(`${getApiBase()}/portfolios`);
   const data = await response.json();
 
@@ -33,6 +37,8 @@ export async function fetchPortfolios(): Promise<PortfolioListItem[]> {
 }
 
 export async function fetchAssets(): Promise<AssetListItem[]> {
+  if (useMockApi()) return mockApi.mockFetchAssets();
+
   const response = await fetch(`${getApiBase()}/assets`);
   const data = await response.json();
 
@@ -46,6 +52,8 @@ export async function fetchAssets(): Promise<AssetListItem[]> {
 export async function fetchPortfolioSummary(
   portfolioId: string
 ): Promise<PortfolioSummary> {
+  if (useMockApi()) return mockApi.mockFetchPortfolioSummary(portfolioId);
+
   const response = await fetch(`${getApiBase()}/portfolios/${portfolioId}/summary`);
   const data = await response.json();
 
@@ -61,6 +69,10 @@ export async function fetchTransactions(
   page = 1,
   pageSize = 10
 ): Promise<TransactionListResponse> {
+  if (useMockApi()) {
+    return mockApi.mockFetchTransactions(portfolioId, page, pageSize);
+  }
+
   const response = await fetch(
     `${getApiBase()}/transactions?portfolioId=${portfolioId}&page=${page}&pageSize=${pageSize}`
   );
@@ -80,6 +92,8 @@ export async function createTransactionApi(input: {
   quantity: number;
   price: number;
 }): Promise<Transaction> {
+  if (useMockApi()) return mockApi.mockCreateTransaction(input);
+
   const response = await fetch(`${getApiBase()}/transactions`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -95,6 +109,11 @@ export async function createTransactionApi(input: {
 }
 
 export async function deleteTransactionApi(id: string): Promise<void> {
+  if (useMockApi()) {
+    mockApi.mockDeleteTransaction(id);
+    return;
+  }
+
   const response = await fetch(`${getApiBase()}/transactions/${id}`, {
     method: "DELETE",
   });
@@ -108,6 +127,8 @@ export async function deleteTransactionApi(id: string): Promise<void> {
 export async function fetchAllocations(
   portfolioId: string
 ): Promise<AllocationItem[]> {
+  if (useMockApi()) return mockApi.mockFetchAllocations(portfolioId);
+
   const response = await fetch(
     `${getApiBase()}/allocations?portfolioId=${portfolioId}`
   );
@@ -123,6 +144,8 @@ export async function saveAllocationApi(input: {
   assetId: number;
   targetRatio: number;
 }): Promise<AllocationItem> {
+  if (useMockApi()) return mockApi.mockSaveAllocation(input);
+
   const response = await fetch(`${getApiBase()}/allocations`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -136,6 +159,11 @@ export async function saveAllocationApi(input: {
 }
 
 export async function deleteAllocationApi(id: string): Promise<void> {
+  if (useMockApi()) {
+    mockApi.mockDeleteAllocation(id);
+    return;
+  }
+
   const response = await fetch(`${getApiBase()}/allocations/${id}`, {
     method: "DELETE",
   });
@@ -148,6 +176,8 @@ export async function deleteAllocationApi(id: string): Promise<void> {
 export async function previewRebalanceApi(
   portfolioId: string
 ): Promise<RebalanceItem[]> {
+  if (useMockApi()) return mockApi.mockPreviewRebalance(portfolioId);
+
   const response = await fetch(
     `${getApiBase()}/portfolios/${portfolioId}/rebalance/preview`,
     {
@@ -164,6 +194,8 @@ export async function previewRebalanceApi(
 export async function applyRebalanceApi(portfolioId: string): Promise<{
   appliedCount: number;
 }> {
+  if (useMockApi()) return mockApi.mockApplyRebalance(portfolioId);
+
   const response = await fetch(
     `${getApiBase()}/portfolios/${portfolioId}/rebalance/apply`,
     {

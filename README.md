@@ -7,7 +7,7 @@
 
 |               |                                                                                                                                                                                         |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Live Demo** | _(現在クラウドデプロイ停止 — 下記 **デモ動画**・**スクリーンショット**・[ローカル実行](#ローカル実行) を参照)_                                                                          |
+| **Live Demo** | [Vercel フロント](https://tf-portfolio-simulator.vercel.app) _(AWS バックエンド終了 — **`NEXT_PUBLIC_USE_MOCK_API=true`** で mock JSON デモ。下記 **デモ動画**・**スクリーンショット**・[ローカル実行](#ローカル実行) を参照)_ |
 | **デモ動画**  | [demo-full.mp4](https://github.com/hwang241101/tf-portfolio-simulator/blob/main/docs/assets/video/demo-full.mp4) _(GitHub ファイルページ・10MB 超はブラウザ再生不可、Raw ダウンロード)_ |
 | **UI 言語**   | 日本語（学習・デモ目的）                                                                                                                                                                |
 
@@ -81,7 +81,7 @@
 | **`/api-proxy`**      | Vercel(HTTPS) → Beanstalk(HTTP) の **Mixed Content** 回避、同一オリジン API 呼び出し |
 | **Elastic Beanstalk** | Express API の zip デプロイ、`npm install` + `node dist/src/app.js`                  |
 | **RDS (MySQL)**       | ポートフォリオ・取引・配分の永続化                                                   |
-| **環境変数**          | EB: `DATABASE_URL` / Vercel: `API_PROXY_TARGET`（または EB URL フォールバック）      |
+| **環境変数**          | EB: `DATABASE_URL` / Vercel: `API_PROXY_TARGET` または **`NEXT_PUBLIC_USE_MOCK_API=true`**（バックエンドなし画面デモ） |
 
 ### デプロイ・運用で経験したこと（要約）
 
@@ -389,7 +389,14 @@ cd frontend
 npm install
 npm run dev            # http://localhost:3000
 # API 既定: http://localhost:4000（NEXT_PUBLIC_API_BASE_URL 未設定時）
+# バックエンドなし UI のみ: NEXT_PUBLIC_USE_MOCK_API=true npm run dev
 ```
+
+**Vercel（mock デモ）** — Project → Settings → Environment Variables:
+
+| 変数 | 値 | 説明 |
+| ---- | -- | ---- |
+| `NEXT_PUBLIC_USE_MOCK_API` | `true` | ブラウザが `/api-proxy` の代わりに内蔵 mock JSON を使用 |
 
 ### Prisma Studio
 
