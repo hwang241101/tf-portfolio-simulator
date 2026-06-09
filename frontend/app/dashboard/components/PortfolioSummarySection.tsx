@@ -685,12 +685,14 @@ export function PortfolioSummarySection({
                       style={{ backgroundColor: item.color }}
                       aria-hidden
                     />
-                    <span className="font-medium text-slate-700">
-                      {item.label}
-                    </span>
-                    <span className="ml-1 tabular-nums text-slate-600">
-                      {formatPercent2(item.value)}%
-                    </span>
+                    <div className="flex w-30 justify-between">
+                      <span className="font-medium text-slate-700">
+                        {item.label}
+                      </span>
+                      <span className="ml-1 tabular-nums text-slate-600">
+                        {formatPercent2(item.value)}%
+                      </span>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -864,10 +866,10 @@ export function PortfolioSummarySection({
                         </TableCell>
                         <TableCell align="right">
                           <Tooltip
-                            title={formatUpTo4(position.totalValue)}
+                            title={formatPercent2(position.totalValue)}
                             placement="top"
                           >
-                            <span>{formatTruncated(position.totalValue)}</span>
+                            <span>{formatPercent2(position.totalValue)}</span>
                           </Tooltip>
                         </TableCell>
                         <TableCell>
