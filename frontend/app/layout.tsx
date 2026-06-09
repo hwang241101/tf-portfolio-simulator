@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppHeader } from "./components/AppHeader";
-import { MockModeBanner } from "./components/MockModeBanner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,7 +29,6 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <MockModeBanner />
         <div className="flex min-h-screen">
           <AppHeader />
           <main className="min-w-0 flex-1">{children}</main>

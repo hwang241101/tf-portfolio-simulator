@@ -99,6 +99,11 @@ export function PortfolioSummarySection({
     Number(value.toFixed(4)).toLocaleString("en-US", {
       maximumFractionDigits: 4,
     });
+  const formatPercent2 = (value: number) =>
+    Number(value.toFixed(2)).toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
   const formatTruncated = (value: number) =>
     Math.trunc(value).toLocaleString("en-US");
   const getRatioBarColor = (percent: number) => {
@@ -638,7 +643,7 @@ export function PortfolioSummarySection({
                     paddingAngle: 2,
                     cornerRadius: 4,
                     valueFormatter: (item) =>
-                      `${formatUpTo4(Number(item.value ?? 0))}%`,
+                      `${formatPercent2(Number(item.value ?? 0))}%`,
                     data: chartPositions.map((position, idx) => ({
                       ...position,
                       color:

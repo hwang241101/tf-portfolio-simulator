@@ -1,16 +1,20 @@
-function wouldUseApiProxy(): boolean {
+function hasHttpsApiConfigured(): boolean {
   const configured = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "");
-  if (typeof window !== "undefined" && window.location.protocol === "https:") {
-    return !configured || configured.startsWith("http://");
-  }
-  return false;
+  return Boolean(configured?.startsWith("https://"));
 }
 
 export function useMockApi(): boolean {
   if (process.env.NEXT_PUBLIC_USE_MOCK_API === "true") return true;
   if (process.env.NEXT_PUBLIC_USE_MOCK_API === "false") return false;
-  // Vercel(HTTPS) with no HTTPS API → skip dead /api-proxy, use in-browser mock
-  return wouldUseApiProxy();
+  if (hasHttpsApiConfigured()) return false;
+
+  // Vercel build/SSR: no window yet — rely on VERCEL env
+  if (typeof window === "undefined") {
+    return process.env.VERCEL === "1";
+  }
+
+  // Browser: HTTPS deploy without HTTPS API URL → mock
+  return window.location.protocol === "https:";
 }
 
 export const MOCK_MODE_BANNER =

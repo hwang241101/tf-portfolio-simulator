@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { fetchPortfolios } from "../lib/api";
+import { MOCK_MODE_BANNER, useMockApi } from "../lib/mock-mode";
 import { PORTFOLIO_CHANGED_EVENT, PORTFOLIO_STORAGE_KEY } from "../lib/portfolio";
 import type { PortfolioListItem } from "../types";
 
@@ -16,6 +17,7 @@ const NAV_ITEMS = [
 
 export function AppHeader() {
   const pathname = usePathname();
+  const mockMode = useMockApi();
   const [portfolios, setPortfolios] = useState<PortfolioListItem[]>([]);
   const [selectedPortfolioId, setSelectedPortfolioId] = useState("");
 
@@ -48,6 +50,11 @@ export function AppHeader() {
       >
         ETF Portfolio Simulator
       </Link>
+      {mockMode ? (
+        <p className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5 text-center text-[11px] font-medium leading-snug text-amber-900">
+          {MOCK_MODE_BANNER}
+        </p>
+      ) : null}
       <div className="glass-card p-3">
         <p className="mb-2 text-xs font-semibold text-slate-500">Portfolio</p>
         <select
