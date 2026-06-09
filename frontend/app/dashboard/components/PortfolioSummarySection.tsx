@@ -160,6 +160,15 @@ export function PortfolioSummarySection({
       },
     ];
   }, [sortedPositions]);
+  const chartData = useMemo(
+    () =>
+      chartPositions.map((position, idx) => ({
+        ...position,
+        color:
+          position.id === "others" ? "#94A3B8" : palette[idx % palette.length],
+      })),
+    [chartPositions],
+  );
   const filteredHistory = useMemo(() => {
     if (!summary) return [];
     const sorted = [...summary.valueHistory].sort(
@@ -624,12 +633,15 @@ export function PortfolioSummarySection({
               )}
             </div>
             <div
-              className={`transition-all duration-[1200ms] ${
+              className={`flex flex-col items-center justify-center gap-4 transition-all duration-[1200ms] sm:flex-row sm:gap-6 ${
                 chartVisible ? "opacity-100" : "opacity-0"
               }`}
             >
               <PieChart
                 height={260}
+                width={260}
+                hideLegend
+                margin={{ left: 4, right: 4, top: 4, bottom: 4 }}
                 slotProps={{
                   tooltip: {
                     trigger: "item",
@@ -638,22 +650,50 @@ export function PortfolioSummarySection({
                 }}
                 series={[
                   {
-                    innerRadius: 55,
-                    outerRadius: 100,
+                    innerRadius: 58,
+                    outerRadius: 96,
                     paddingAngle: 2,
                     cornerRadius: 4,
+                    arcLabel: (item) => {
+                      const percent = Number(item.value ?? 0);
+                      return percent >= 8 ? `${formatPercent2(percent)}%` : "";
+                    },
+                    arcLabelMinAngle: 22,
+                    arcLabelRadius: "74%",
                     valueFormatter: (item) =>
                       `${formatPercent2(Number(item.value ?? 0))}%`,
-                    data: chartPositions.map((position, idx) => ({
-                      ...position,
-                      color:
-                        position.id === "others"
-                          ? "#94A3B8"
-                          : palette[idx % palette.length],
-                    })),
+                    data: chartData,
                   },
                 ]}
+                sx={{
+                  "& .MuiPieArcLabel-root": {
+                    fill: "#0f2749",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    stroke: "#ffffff",
+                    strokeWidth: 4,
+                    strokeLinejoin: "round",
+                    paintOrder: "stroke fill",
+                  },
+                }}
               />
+              <ul className="w-full max-w-[180px] space-y-1.5 text-sm">
+                {chartData.map((item) => (
+                  <li key={item.id} className="flex items-center gap-1.5">
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: item.color }}
+                      aria-hidden
+                    />
+                    <span className="font-medium text-slate-700">
+                      {item.label}
+                    </span>
+                    <span className="ml-1 tabular-nums text-slate-600">
+                      {formatPercent2(item.value)}%
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </Paper>
 
@@ -721,6 +761,11 @@ export function PortfolioSummarySection({
                         anchor: "pointer",
                       },
                     }}
+                    yAxis={[
+                      {
+                        width: 50,
+                      },
+                    ]}
                     sx={{
                       "& .MuiChartsAxis-line": {
                         stroke: "#60A5FA",

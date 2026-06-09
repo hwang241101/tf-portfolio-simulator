@@ -440,6 +440,11 @@ export default function RiskAnalysisPage() {
                             value.split("__")[0] ?? value,
                         },
                       ]}
+                      yAxis={[
+                        {
+                          width: 50,
+                        },
+                      ]}
                       series={[
                         {
                           data: growthValues,
